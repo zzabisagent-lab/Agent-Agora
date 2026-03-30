@@ -2,9 +2,11 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 
 const config = require('./config/env');
 const healthRoutes = require('./routes/healthRoutes');
+const humanRoutes = require('./routes/humanRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -12,6 +14,7 @@ const app = express();
 app.use(helmet());
 app.use(cors({ origin: config.frontendUrl, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 if (config.nodeEnv === 'development') {
   app.use(morgan('dev'));
@@ -19,6 +22,7 @@ if (config.nodeEnv === 'development') {
 
 app.use('/health', healthRoutes);
 app.use(`${config.apiBasePath}/health`, healthRoutes);
+app.use(`${config.apiBasePath}/human`, humanRoutes);
 
 app.use(`${config.apiBasePath}/*`, (_req, res) => {
   res.status(404).json({
