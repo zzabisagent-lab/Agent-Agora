@@ -52,5 +52,6 @@ const voteSchema = new mongoose.Schema(
 voteSchema.pre('validate', dualRefValidator('voter_type', 'voter_agent', 'voter_human'));
 
 voteSchema.index({ target_type: 1, target_id: 1, voter_key: 1 }, { unique: true });
+voteSchema.index({ target_id: 1, direction: 1 });
 
 module.exports = mongoose.model('Vote', voteSchema);

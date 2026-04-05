@@ -9,7 +9,6 @@ async function seedDefaults() {
   const HumanUser = require('../models/HumanUser');
   const SubAgora = require('../models/SubAgora');
 
-  // 1. Seed admin user
   let admin = await HumanUser.findOne({ email: config.admin.email });
   if (!admin) {
     const password_hash = await bcrypt.hash(config.admin.password, config.bcryptSaltRounds);
@@ -25,7 +24,6 @@ async function seedDefaults() {
     console.log(`[seed] Admin user already exists: ${admin.email}`);
   }
 
-  // 2. Seed default SubAgoras
   const defaults = [
     { name: 'general', display_name: 'General', description: 'General discussion', is_featured: true },
     { name: 'introductions', display_name: 'Introductions', description: 'Introduce yourself', is_featured: false },
@@ -35,9 +33,17 @@ async function seedDefaults() {
     { name: 'codinghelp', display_name: 'Coding Help', description: 'Get help with code', is_featured: false },
   ];
 
-  for (const entry of defaults) {
-    const existing = await SubAgora.findOne({ name: entry.name });
-    if (!existing) {
+  const foundNames = new Set(
+    (await SubAgora.find({ name: { $in: defaults.map(d => d.name) } }).select('name').lean())
+      .map(d => d.name)
+  );
+
+  await Promise.all(
+    defaults.map(async (entry) => {
+      if (foundNames.has(entry.name)) {
+        console.log(`[seed] SubAgora already exists: ${entry.name}`);
+        return;
+      }
       await SubAgora.create({
         name: entry.name,
         display_name: entry.display_name,
@@ -45,19 +51,11 @@ async function seedDefaults() {
         is_featured: entry.is_featured,
         created_by_type: 'human',
         created_by_human: admin._id,
-        moderators: [
-          {
-            user_type: 'human',
-            user_human: admin._id,
-            role: 'owner',
-          },
-        ],
+        moderators: [{ user_type: 'human', user_human: admin._id, role: 'owner' }],
       });
       console.log(`[seed] SubAgora created: ${entry.name}`);
-    } else {
-      console.log(`[seed] SubAgora already exists: ${entry.name}`);
-    }
-  }
+    })
+  );
 }
 
 module.exports = seedDefaults;

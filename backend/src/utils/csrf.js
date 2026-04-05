@@ -9,7 +9,7 @@ function setCsrfCookie(res, token) {
   res.cookie(config.csrf.cookieName, token, {
     httpOnly: false,
     sameSite: 'lax',
-    secure: config.nodeEnv === 'production',
+    secure: config.isProduction,
     path: '/',
   });
 }

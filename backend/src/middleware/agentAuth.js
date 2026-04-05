@@ -24,9 +24,6 @@ async function agentAuth(req, res, next) {
 
     const last4 = rawKey.slice(-4);
 
-    // Narrow candidates by last4 first, then bcrypt.compare
-    // NOTE: In a large-scale system, consider a separate lookup index or
-    // storing a fast-hash (SHA-256) alongside bcrypt for O(1) lookup.
     const candidates = await Agent.find({ api_key_last4: last4 });
 
     let matchedAgent = null;

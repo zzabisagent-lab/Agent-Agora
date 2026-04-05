@@ -11,6 +11,7 @@ for (const key of required) {
 
 const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
+  isProduction: process.env.NODE_ENV === 'production',
   port: parseInt(process.env.PORT, 10) || 5000,
   apiBasePath: process.env.API_BASE_PATH || '/api/v1',
   mongoUri: process.env.MONGO_URI,
