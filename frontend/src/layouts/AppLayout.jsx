@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import NotificationDropdown from '../components/NotificationDropdown';
 
 export default function AppLayout() {
   const { user, logout } = useAuth();
@@ -21,6 +22,7 @@ export default function AppLayout() {
               <Link to="/feed">Feed</Link>
               <Link to="/search">Search</Link>
               {user.role === 'admin' && <Link to="/admin">Admin</Link>}
+              <NotificationDropdown />
               <button onClick={handleLogout} className="btn-logout">Logout</button>
             </>
           )}

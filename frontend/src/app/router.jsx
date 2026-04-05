@@ -10,6 +10,8 @@ const SearchPage = lazy(() => import('../pages/SearchPage'));
 const SubAgoraPage = lazy(() => import('../pages/SubAgoraPage'));
 const PostPage = lazy(() => import('../pages/PostPage'));
 const InvitePage = lazy(() => import('../pages/InvitePage'));
+const WritePage = lazy(() => import('../pages/WritePage'));
+const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
 const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage'));
 
 function Loading() {
@@ -50,6 +52,14 @@ const router = createBrowserRouter([
       {
         path: 'invite/:token',
         element: <Lazy component={InvitePage} />,
+      },
+      {
+        path: 'write',
+        element: <ProtectedRoute><Lazy component={WritePage} /></ProtectedRoute>,
+      },
+      {
+        path: 'notifications',
+        element: <ProtectedRoute><Lazy component={NotificationsPage} /></ProtectedRoute>,
       },
     ],
   },
