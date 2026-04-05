@@ -13,6 +13,11 @@ const InvitePage = lazy(() => import('../pages/InvitePage'));
 const WritePage = lazy(() => import('../pages/WritePage'));
 const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
 const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage'));
+const AdminInvitationsPage = lazy(() => import('../pages/admin/AdminInvitationsPage'));
+const AdminAgentsPage = lazy(() => import('../pages/admin/AdminAgentsPage'));
+const AdminHumansPage = lazy(() => import('../pages/admin/AdminHumansPage'));
+const AdminAuditLogsPage = lazy(() => import('../pages/admin/AdminAuditLogsPage'));
+const AdminSubAgorasPage = lazy(() => import('../pages/admin/AdminSubAgorasPage'));
 
 function Loading() {
   return <div className="loading">Loading...</div>;
@@ -68,6 +73,11 @@ const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       { index: true, element: <Lazy component={AdminDashboardPage} /> },
+      { path: 'invitations', element: <Lazy component={AdminInvitationsPage} /> },
+      { path: 'agents', element: <Lazy component={AdminAgentsPage} /> },
+      { path: 'humans', element: <Lazy component={AdminHumansPage} /> },
+      { path: 'audit-logs', element: <Lazy component={AdminAuditLogsPage} /> },
+      { path: 'subagoras', element: <Lazy component={AdminSubAgorasPage} /> },
     ],
   },
 ]);

@@ -17,6 +17,15 @@ const feedRoutes = require('./routes/feedRoutes');
 const followRoutes = require('./routes/followRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const searchRoutes = require('./routes/searchRoutes');
+const verificationRoutes = require('./routes/verificationRoutes');
+const {
+  publicLimiter,
+  authLimiter,
+  contentReadLimiter,
+  searchLimiter,
+  adminReadLimiter,
+  sharedWriteLimiter,
+} = require('./middleware/rateLimitFactory');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -32,17 +41,18 @@ if (config.nodeEnv === 'development') {
 
 app.use('/health', healthRoutes);
 app.use(`${config.apiBasePath}/health`, healthRoutes);
-app.use(`${config.apiBasePath}/human`, humanRoutes);
-app.use(`${config.apiBasePath}/invitations`, invitationRoutes);
-app.use(`${config.apiBasePath}/agents`, agentRoutes);
-app.use(`${config.apiBasePath}/admin`, adminRoutes);
-app.use(`${config.apiBasePath}/subagoras`, subagoraRoutes);
-app.use(`${config.apiBasePath}/posts`, postRoutes);
-app.use(`${config.apiBasePath}/comments`, commentRoutes);
-app.use(`${config.apiBasePath}/feed`, feedRoutes);
-app.use(`${config.apiBasePath}/agents`, followRoutes);
-app.use(`${config.apiBasePath}/notifications`, notificationRoutes);
-app.use(`${config.apiBasePath}/search`, searchRoutes);
+app.use(`${config.apiBasePath}/human`, authLimiter, humanRoutes);
+app.use(`${config.apiBasePath}/invitations`, publicLimiter, invitationRoutes);
+app.use(`${config.apiBasePath}/agents`, contentReadLimiter, agentRoutes);
+app.use(`${config.apiBasePath}/admin`, adminReadLimiter, adminRoutes);
+app.use(`${config.apiBasePath}/subagoras`, contentReadLimiter, subagoraRoutes);
+app.use(`${config.apiBasePath}/posts`, contentReadLimiter, postRoutes);
+app.use(`${config.apiBasePath}/comments`, contentReadLimiter, commentRoutes);
+app.use(`${config.apiBasePath}/feed`, contentReadLimiter, feedRoutes);
+app.use(`${config.apiBasePath}/agents`, sharedWriteLimiter, followRoutes);
+app.use(`${config.apiBasePath}/notifications`, contentReadLimiter, notificationRoutes);
+app.use(`${config.apiBasePath}/search`, searchLimiter, searchRoutes);
+app.use(`${config.apiBasePath}/verify`, sharedWriteLimiter, verificationRoutes);
 
 app.use(`${config.apiBasePath}/*`, (_req, res) => {
   res.status(404).json({

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import VoteButtons from '../components/VoteButtons';
 import CommentTree from '../components/CommentTree';
@@ -17,12 +17,14 @@ export default function PostPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const loadPost = useCallback(() => {
     Promise.all([getPost(post_id), listComments(post_id)])
       .then(([p, c]) => { setPost(p); setComments(c.items || []); })
       .catch(() => setError('Post not found'))
       .finally(() => setLoading(false));
   }, [post_id]);
+
+  useEffect(() => { loadPost(); }, [loadPost]);
 
   async function handleComment(e) {
     e.preventDefault();
@@ -62,7 +64,7 @@ export default function PostPage() {
       {post.type === 'image' && post.url && (
         <img src={post.url} alt={post.title} className="post-image" />
       )}
-      <VerificationPanel content={post} />
+      <VerificationPanel content={post} contentType="post" onRefresh={loadPost} />
       <VoteButtons score={post.score} onUpvote={() => upvotePost(post_id)} onDownvote={() => downvotePost(post_id)} />
 
       <section className="comments-section">

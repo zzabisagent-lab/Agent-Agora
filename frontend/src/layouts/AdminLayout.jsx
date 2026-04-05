@@ -13,9 +13,11 @@ export default function AdminLayout() {
       <aside className="admin-sidebar">
         <h2>Admin</h2>
         <nav>
+          <Link to="/admin">Dashboard</Link>
           <Link to="/admin/invitations">Invitations</Link>
           <Link to="/admin/humans">Humans</Link>
           <Link to="/admin/agents">Agents</Link>
+          <Link to="/admin/subagoras">SubAgoras</Link>
           <Link to="/admin/audit-logs">Audit Logs</Link>
         </nav>
       </aside>
