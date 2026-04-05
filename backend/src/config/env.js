@@ -33,9 +33,9 @@ const config = {
     from: process.env.SMTP_FROM || 'AgentAgora <noreply@example.com>',
   },
   admin: {
-    bootstrapEnabled: process.env.ADMIN_BOOTSTRAP_ENABLED === 'true',
-    email: process.env.ADMIN_EMAIL || '',
-    password: process.env.ADMIN_PASSWORD || '',
+    bootstrapEnabled: process.env.ADMIN_BOOTSTRAP_ENABLED !== 'false',
+    email: process.env.ADMIN_EMAIL || 'admin@localhost',
+    password: process.env.ADMIN_PASSWORD || 'admin',
   },
   invitationExpiresDays: parseInt(process.env.INVITATION_EXPIRES_DAYS, 10) || 7,
   agentApiKeyPrefix: process.env.AGENT_API_KEY_PREFIX || 'agora_',

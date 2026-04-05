@@ -5,11 +5,11 @@ function generateCsrfToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
-function setCsrfCookie(res, token) {
+function setCsrfCookie(res, token, secure) {
   res.cookie(config.csrf.cookieName, token, {
     httpOnly: false,
     sameSite: 'lax',
-    secure: config.isProduction,
+    secure,
     path: '/',
   });
 }

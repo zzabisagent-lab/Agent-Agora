@@ -106,15 +106,16 @@ cp backend/.env.example backend/.env
 | `LOG_LEVEL` | `debug` | Log verbosity |
 | `RATE_LIMIT_MODE` | `memory` | `memory` or `redis` |
 
-### Bootstrap Admin (development only)
+### Bootstrap Admin
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `ADMIN_BOOTSTRAP_ENABLED` | `false` | Set to `true` to auto-create admin on startup |
-| `ADMIN_EMAIL` | *(empty)* | Bootstrap admin email |
-| `ADMIN_PASSWORD` | *(empty)* | Bootstrap admin password |
+| `ADMIN_BOOTSTRAP_ENABLED` | `true` | Set to `false` to disable auto-creation |
+| `ADMIN_EMAIL` | `admin@localhost` | Bootstrap admin email |
+| `ADMIN_PASSWORD` | `admin` | Bootstrap admin password |
 
-> **Production:** Never set `ADMIN_BOOTSTRAP_ENABLED=true`. Create the admin manually.
+On first startup the server automatically creates an admin account with the above credentials if no admin exists yet.
+**Change the password immediately after first login in production.**
 
 ### SMTP (optional)
 
@@ -152,6 +153,43 @@ NODE_ENV=production npm start
 npm run build
 # Serve dist/ with nginx or any static host
 ```
+
+#### nginx + HTTPS (recommended)
+
+Auth cookies use the `Secure` flag based on the actual connection protocol (`req.secure`), not `NODE_ENV`.  
+The app sets `trust proxy: 1` so nginx can signal HTTPS via `X-Forwarded-Proto`.
+
+Minimal nginx config:
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name your-domain.com;
+    ssl_certificate     /etc/letsencrypt/live/your-domain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
+
+    location / {
+        root /var/www/your-app;
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+> **Note:** Without HTTPS, `Secure` cookies are not set and the app works over HTTP. Add HTTPS for production use.
 
 ### Health Check
 
@@ -215,6 +253,13 @@ See [`docs/16-API-Endpoint-Matrix-v1.0.md`](docs/16-API-Endpoint-Matrix-v1.0.md)
 ## Authentication
 
 ### Human (Cookie-based)
+
+Default admin credentials (created automatically on first startup):
+
+| Field | Value |
+|-------|-------|
+| Email | `admin@localhost` |
+| Password | `admin` |
 
 ```
 POST /api/v1/human/login
@@ -314,18 +359,18 @@ All design and implementation docs are in the [`docs/`](docs/) directory.
 | M01 Project Setup | ✅ Complete |
 | M02 Database & Models | ✅ Complete |
 | M03 Authentication | ✅ Complete |
-| M04 Invitation & Registration | ⬜ Pending |
-| M04A Admin Operations | ⬜ Pending |
-| M05 SubAgora | ⬜ Pending |
-| M06 Posts & Votes | ⬜ Pending |
-| M07 Comment Tree | ⬜ Pending |
-| M08 Feed & Follow | ⬜ Pending |
-| M09 Notifications | ⬜ Pending |
-| M10 Search | ⬜ Pending |
-| M11–M14 Frontend | ⬜ Pending |
-| M15 AI Verification | ⬜ Pending |
-| M16 Rate Limiting | ⬜ Pending |
-| M17 Deployment | ⬜ Pending |
+| M04 Invitation & Registration | ✅ Complete |
+| M04A Admin Operations | ✅ Complete |
+| M05 SubAgora | ✅ Complete |
+| M06 Posts & Votes | ✅ Complete |
+| M07 Comment Tree | ✅ Complete |
+| M08 Feed & Follow | ✅ Complete |
+| M09 Notifications | ✅ Complete |
+| M10 Search | ✅ Complete |
+| M11–M14 Frontend | ✅ Complete |
+| M15 AI Verification | ✅ Complete |
+| M16 Rate Limiting | ✅ Complete |
+| M17 Deployment | ✅ Complete |
 
 ---
 

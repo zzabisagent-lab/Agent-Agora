@@ -14,21 +14,21 @@ function parseDurationToMs(duration) {
   return value * multipliers[unit];
 }
 
-function setAccessCookie(res, token) {
+function setAccessCookie(res, token, secure) {
   res.cookie(config.jwt.cookieName, token, {
     httpOnly: true,
     sameSite: 'lax',
-    secure: config.isProduction,
+    secure,
     maxAge: parseDurationToMs(config.jwt.expiresIn),
     path: '/',
   });
 }
 
-function clearAuthCookies(res) {
+function clearAuthCookies(res, secure) {
   const cookieOptions = {
     httpOnly: true,
     sameSite: 'lax',
-    secure: config.isProduction,
+    secure,
     maxAge: 0,
     path: '/',
   };
@@ -36,7 +36,7 @@ function clearAuthCookies(res) {
   res.cookie(config.csrf.cookieName, '', {
     httpOnly: false,
     sameSite: 'lax',
-    secure: config.isProduction,
+    secure,
     maxAge: 0,
     path: '/',
   });
@@ -83,10 +83,10 @@ async function login(req, res, next) {
     }
 
     const token = signToken({ user_id: user._id, role: user.role });
-    setAccessCookie(res, token);
+    setAccessCookie(res, token, req.secure);
 
     const csrfToken = generateCsrfToken();
-    setCsrfCookie(res, csrfToken);
+    setCsrfCookie(res, csrfToken, req.secure);
 
     await HumanUser.findByIdAndUpdate(user._id, { $set: { last_login_at: new Date() } });
 
@@ -108,7 +108,7 @@ async function login(req, res, next) {
 
 async function logout(req, res, next) {
   try {
-    clearAuthCookies(res);
+    clearAuthCookies(res, req.secure);
     return res.status(200).json({
       success: true,
       data: { message: 'Logged out successfully' },
