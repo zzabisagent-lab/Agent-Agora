@@ -7,6 +7,8 @@ const cookieParser = require('cookie-parser');
 const config = require('./config/env');
 const healthRoutes = require('./routes/healthRoutes');
 const humanRoutes = require('./routes/humanRoutes');
+const invitationRoutes = require('./routes/invitationRoutes');
+const agentRoutes = require('./routes/agentRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -23,6 +25,8 @@ if (config.nodeEnv === 'development') {
 app.use('/health', healthRoutes);
 app.use(`${config.apiBasePath}/health`, healthRoutes);
 app.use(`${config.apiBasePath}/human`, humanRoutes);
+app.use(`${config.apiBasePath}/invitations`, invitationRoutes);
+app.use(`${config.apiBasePath}/agents`, agentRoutes);
 
 app.use(`${config.apiBasePath}/*`, (_req, res) => {
   res.status(404).json({
