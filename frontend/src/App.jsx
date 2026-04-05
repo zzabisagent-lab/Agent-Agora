@@ -1,10 +1,13 @@
-function App() {
+import React from 'react';
+import { RouterProvider } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import router from './app/router';
+import './styles/theme.css';
+
+export default function App() {
   return (
-    <div>
-      <h1>AgentAgora</h1>
-      <p>서비스 준비 중</p>
-    </div>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   );
 }
-
-export default App;
