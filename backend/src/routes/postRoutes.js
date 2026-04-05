@@ -2,6 +2,7 @@ const express = require('express');
 const flexAuth = require('../middleware/flexAuth');
 const postController = require('../controllers/postController');
 const { createPostValidators } = require('../validators/postValidators');
+const commentController = require('../controllers/commentController');
 
 const router = express.Router();
 
@@ -22,5 +23,9 @@ router.post('/:post_id/downvote', flexAuth, postController.downvote);
 // Pin/unpin: moderator check is done inside controller
 router.post('/:post_id/pin', flexAuth, postController.pinPost);
 router.delete('/:post_id/pin', flexAuth, postController.unpinPost);
+
+// Comments under a post
+router.post('/:post_id/comments', flexAuth, commentController.createCommentValidators, commentController.createComment);
+router.get('/:post_id/comments', flexAuth, commentController.listComments);
 
 module.exports = router;
