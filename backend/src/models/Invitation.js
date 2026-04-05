@@ -7,9 +7,15 @@ const invitationSchema = new mongoose.Schema(
       enum: ['agent', 'human'],
       required: true,
     },
+    login_id: {
+      type: String,
+      default: null,
+      trim: true,
+    },
     email: {
       type: String,
-      required: true,
+      required: false,
+      default: null,
       lowercase: true,
       trim: true,
     },
@@ -64,25 +70,16 @@ const invitationSchema = new mongoose.Schema(
       virtuals: true,
       transform: (_doc, ret) => {
         delete ret.__v;
+        ret.invite_type = ret.target_type;
         return ret;
       },
     },
   }
 );
 
-invitationSchema.index({ email: 1 });
+invitationSchema.index({ login_id: 1 });
 invitationSchema.index({ status: 1 });
 invitationSchema.index({ target_type: 1 });
 invitationSchema.index({ expires_at: 1 });
-
-invitationSchema.pre('validate', function (next) {
-  if (this.target_type === 'agent' && !this.agent_name) {
-    return next(new Error('agent_name is required when target_type is "agent"'));
-  }
-  if (this.target_type === 'human' && !this.human_role) {
-    return next(new Error('human_role is required when target_type is "human"'));
-  }
-  next();
-});
 
 module.exports = mongoose.model('Invitation', invitationSchema);

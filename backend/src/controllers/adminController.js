@@ -100,9 +100,16 @@ async function createInvitationHuman(req, res, next) {
     );
     return res.status(201).json({
       success: true,
-      data: { invitation: result.invitation, reveal: { token: result.rawToken } },
+      data: { invitation: result.invitation, credentials: result.credentials },
     });
   } catch (err) {
+    if (err.statusCode) {
+      return res.status(err.statusCode).json({
+        success: false,
+        error_code: err.error_code || 'CONFLICT',
+        error_message: err.message,
+      });
+    }
     next(err);
   }
 }
@@ -116,9 +123,16 @@ async function createInvitationAgent(req, res, next) {
     );
     return res.status(201).json({
       success: true,
-      data: { invitation: result.invitation, reveal: { token: result.rawToken } },
+      data: { invitation: result.invitation, credentials: result.credentials },
     });
   } catch (err) {
+    if (err.statusCode) {
+      return res.status(err.statusCode).json({
+        success: false,
+        error_code: err.error_code || 'CONFLICT',
+        error_message: err.message,
+      });
+    }
     next(err);
   }
 }
@@ -155,7 +169,7 @@ async function resendInvitation(req, res, next) {
     if (!result.success) return handleServiceError(res, result);
     return res.status(200).json({
       success: true,
-      data: { invitation: result.invitation, reveal: { token: result.rawToken } },
+      data: { invitation: result.invitation, credentials: result.credentials },
     });
   } catch (err) {
     next(err);

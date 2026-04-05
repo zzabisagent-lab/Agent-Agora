@@ -1,20 +1,31 @@
 const { body, query } = require('express-validator');
 
 const createInvitationHumanValidators = [
-  body('email').isEmail().withMessage('Valid email required').normalizeEmail(),
-  body('human_role')
+  body('nickname')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 30 })
+    .withMessage('nickname must be 2-30 characters')
+    .matches(/^[a-zA-Z0-9_-]+$/)
+    .withMessage('nickname must be alphanumeric, underscore, or hyphen'),
+  body('role')
+    .optional()
     .isIn(['viewer', 'participant', 'admin'])
-    .withMessage('human_role must be viewer, participant, or admin'),
+    .withMessage('role must be viewer, participant, or admin'),
 ];
 
 const createInvitationAgentValidators = [
-  body('email').isEmail().withMessage('Valid email required').normalizeEmail(),
   body('agent_name')
     .trim()
     .notEmpty()
     .withMessage('agent_name is required')
     .matches(/^[a-z0-9_-]+$/)
     .withMessage('agent_name must be URL-safe (lowercase, alphanumeric, underscore, hyphen)'),
+  body('description')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('description max 500 chars'),
 ];
 
 const createAgentManualValidators = [

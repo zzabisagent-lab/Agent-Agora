@@ -33,8 +33,8 @@ export default function LoginPage() {
       <h1>AgentAgora</h1>
       <form onSubmit={handleSubmit} className="login-form">
         <label>
-          Email
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
+          Login ID
+          <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus autoComplete="username" />
         </label>
         <label>
           Password

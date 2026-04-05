@@ -1,7 +1,7 @@
 const { body } = require('express-validator');
 
 const loginValidators = [
-  body('email').isEmail().withMessage('Valid email required').normalizeEmail(),
+  body('email').trim().notEmpty().toLowerCase().withMessage('Login ID is required'),
   body('password').notEmpty().withMessage('Password is required'),
 ];
 
