@@ -203,4 +203,4 @@ async function unpinPost(postId, subAgoraName) {
   return { success: true, post };
 }
 
-module.exports = { createPost, listPosts, getPost, deletePost, pinPost, unpinPost };
+module.exports = { createPost, listPosts, getPost, deletePost, pinPost, unpinPost, serializePost };

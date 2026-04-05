@@ -2,6 +2,7 @@ const express = require('express');
 const flexAuth = require('../middleware/flexAuth');
 const buildModeratorAuth = require('../middleware/moderatorAuth');
 const subagoraController = require('../controllers/subagoraController');
+const feedController = require('../controllers/feedController');
 
 const router = express.Router();
 
@@ -25,5 +26,8 @@ router.delete('/:subagora_name/subscribe', flexAuth, subagoraController.unsubscr
 // Moderator add/remove: owner only
 router.post('/:subagora_name/moderators', ownerModeratorAuth, subagoraController.moderatorBodyValidators, subagoraController.addModerator);
 router.delete('/:subagora_name/moderators', ownerModeratorAuth, subagoraController.moderatorBodyValidators, subagoraController.removeModerator);
+
+// SubAgora feed
+router.get('/:subagora_name/feed', flexAuth, feedController.getSubAgoraFeed);
 
 module.exports = router;
