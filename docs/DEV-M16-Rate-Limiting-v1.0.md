@@ -1,71 +1,71 @@
-# M16 - 공개/인증/콘텐츠/검색/관리자 API별 rate limit 정책 적용 DEV Guide
+# M16 - Rate Limit Policy Application per Public/Auth/Content/Search/Admin API DEV Guide
 Version: 1.0.0
 Last Updated: 2026-03-28
 
-## 1. 목표
+## 1. Objective
 
-공개/인증/콘텐츠/검색/관리자 API별 rate limit 정책을 적용한다.
+Apply rate limit policies per public/auth/content/search/admin API.
 
-## 2. 모듈 유형
-- Phase: 고급/운영
-- 영역: backend
+## 2. Module Type
+- Phase: Advanced/Operations
+- Domain: backend
 
-## 3. 선행 모듈
+## 3. Prerequisite Modules
 - M03
 - M04A
 - M06
 
-## 4. 구현 범위
+## 4. Implementation Scope
 - route-group limiter
 - headers
 - 429 error mapping
 - actor/ip based keys
 - dev/prod mode
 
-## 5. 제외 범위
-- 글로벌 WAF
-- 봇 탐지 시스템
+## 5. Out of Scope
+- Global WAF
+- Bot detection system
 
-## 6. 관련 모델
-- 해당 없음
+## 6. Related Models
+- N/A
 
-## 7. 관련 API / 페이지
+## 7. Related APIs / Pages
 
 ### API
 - applies to all selected routes
 
 ### Page / Route
-- 해당 없음
+- N/A
 
-## 8. 산출물
+## 8. Deliverables
 - rate limiter factory
 - route configs
 - 429 handler
 
-## 9. 핵심 비즈니스 규칙
-- public는 IP 기준, 분당 60회
-- auth(login)는 IP 기준, 분당 10회
-- human/admin write는 user id 기준, 분당 30회
-- agent write는 agent id 기준, 분당 60회
-- content read는 actor id 또는 IP 기준, 분당 120회
-- search는 actor id 또는 IP 기준, 분당 30회
-- admin read는 user id 기준, 분당 60회
-- 429 응답에 표준 error_code + Retry-After/X-RateLimit-Remaining 헤더 노출
-- dev 환경에서는 limit을 10배로 완화 가능
+## 9. Core Business Rules
+- public: IP-based, 60 requests per minute
+- auth (login): IP-based, 10 requests per minute
+- human/admin write: user id-based, 30 requests per minute
+- agent write: agent id-based, 60 requests per minute
+- content read: actor id or IP-based, 120 requests per minute
+- search: actor id or IP-based, 30 requests per minute
+- admin read: user id-based, 60 requests per minute
+- 429 responses expose standard error_code + Retry-After/X-RateLimit-Remaining headers
+- In dev environment, limits can be relaxed by 10x
 
-## 10. 권장 구현 순서
-1. route group policy 표 정의
-2. factory middleware 작성
-3. per-route 적용
-4. 429 response 표준화
-5. ops env switch 반영
+## 10. Recommended Implementation Order
+1. Define route group policy table
+2. Write factory middleware
+3. Apply per-route
+4. Standardize 429 response
+5. Reflect ops env switch
 
-## 11. 구현 시 주의사항
+## 11. Implementation Notes
 
-CODE-Common-Patterns.md §6 공통 구현 시 주의사항을 따른다.
+Follow CODE-Common-Patterns.md §6 Common Implementation Notes.
 
-## 12. 완료 기준
-- public/auth/content/search/admin 각 group 429
+## 12. Completion Criteria
+- 429 for each of public/auth/content/search/admin groups
 - remaining/reset headers
-- dev 완화 모드
-- key generator 분기
+- dev relaxed mode
+- key generator branching
