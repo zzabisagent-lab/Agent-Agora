@@ -7,7 +7,7 @@ const config = require('../config/env');
 
 function parseDurationToMs(duration) {
   const match = duration.match(/^(\d+)([smhd])$/);
-  if (!match) return 7 * 24 * 60 * 60 * 1000; // default 7d
+  if (!match) return 7 * 24 * 60 * 60 * 1000;
   const value = parseInt(match[1], 10);
   const unit = match[2];
   const multipliers = { s: 1000, m: 60000, h: 3600000, d: 86400000 };
@@ -18,7 +18,7 @@ function setAccessCookie(res, token) {
   res.cookie(config.jwt.cookieName, token, {
     httpOnly: true,
     sameSite: 'lax',
-    secure: config.nodeEnv === 'production',
+    secure: config.isProduction,
     maxAge: parseDurationToMs(config.jwt.expiresIn),
     path: '/',
   });
@@ -28,7 +28,7 @@ function clearAuthCookies(res) {
   const cookieOptions = {
     httpOnly: true,
     sameSite: 'lax',
-    secure: config.nodeEnv === 'production',
+    secure: config.isProduction,
     maxAge: 0,
     path: '/',
   };
@@ -36,7 +36,7 @@ function clearAuthCookies(res) {
   res.cookie(config.csrf.cookieName, '', {
     httpOnly: false,
     sameSite: 'lax',
-    secure: config.nodeEnv === 'production',
+    secure: config.isProduction,
     maxAge: 0,
     path: '/',
   });
@@ -88,8 +88,7 @@ async function login(req, res, next) {
     const csrfToken = generateCsrfToken();
     setCsrfCookie(res, csrfToken);
 
-    user.last_login_at = new Date();
-    await user.save();
+    await HumanUser.findByIdAndUpdate(user._id, { $set: { last_login_at: new Date() } });
 
     return res.status(200).json({
       success: true,
@@ -147,22 +146,23 @@ async function updateProfile(req, res, next) {
 
     const { nickname } = req.body;
 
-    if (nickname !== undefined) {
-      const existing = await HumanUser.findOne({ nickname, _id: { $ne: req.user._id } });
-      if (existing) {
+    let updated;
+    try {
+      updated = await HumanUser.findByIdAndUpdate(
+        req.user._id,
+        { ...(nickname !== undefined && { nickname }) },
+        { new: true, runValidators: true }
+      ).select('_id email nickname role');
+    } catch (err) {
+      if (err.code === 11000) {
         return res.status(409).json({
           success: false,
           error_code: 'NICKNAME_ALREADY_USED',
           error_message: 'Nickname is already taken',
         });
       }
+      throw err;
     }
-
-    const updated = await HumanUser.findByIdAndUpdate(
-      req.user._id,
-      { ...(nickname !== undefined && { nickname }) },
-      { new: true, runValidators: true }
-    ).select('_id email nickname role');
 
     return res.status(200).json({
       success: true,

@@ -46,7 +46,6 @@ async function humanAuth(req, res, next) {
       email: user.email,
       nickname: user.nickname,
       role: user.role,
-      is_active: user.is_active,
     };
     next();
   } catch (err) {

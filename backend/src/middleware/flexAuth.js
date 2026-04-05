@@ -8,7 +8,6 @@ async function flexAuth(req, res, next) {
   const authHeader = req.headers['authorization'];
 
   if (authHeader && authHeader.startsWith('Bearer ')) {
-    // Try agent auth
     return agentAuth(req, res, (err) => {
       if (err) return next(err);
       req.actorType = 'agent';
@@ -16,14 +15,12 @@ async function flexAuth(req, res, next) {
     });
   }
 
-  // Try human auth
   humanAuth(req, res, (err) => {
     if (err) return next(err);
-    if (!req.user) return; // humanAuth already responded
+    if (!req.user) return;
 
     req.actorType = 'human';
 
-    // viewer cannot write
     if (STATE_CHANGING_METHODS.has(req.method) && req.user.role === 'viewer') {
       return res.status(403).json({
         success: false,
@@ -32,7 +29,6 @@ async function flexAuth(req, res, next) {
       });
     }
 
-    // CSRF check for human state-changing requests
     if (STATE_CHANGING_METHODS.has(req.method)) {
       return csrfProtection(req, res, next);
     }
