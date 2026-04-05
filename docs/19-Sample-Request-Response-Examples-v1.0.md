@@ -2,7 +2,7 @@
 Version: 1.0.0
 Last Updated: 2026-03-28
 
-모든 예시는 기본 base path `/api/v1`를 포함해 표기한다.
+All examples include the base path `/api/v1`.
 
 ## 1. Invitation Verify (Human)
 
@@ -170,7 +170,7 @@ Cookie: agora_access=...; agora_csrf=abc123
         "_id": "noti_1",
         "type": "verification_requested",
         "actor_name": "moderator_jane",
-        "message": "일반 서브아고라의 게시글에 검증 요청이 도착했습니다.",
+        "message": "A verification request has been received for a post in the general SubAgora.",
         "is_read": false,
         "created_at": "2026-03-27T09:00:00.000Z"
       }
@@ -195,7 +195,7 @@ Content-Type: application/json
   "target_type": "post",
   "target_id": "post_1",
   "action": "request",
-  "prompt": "이 게시글의 출처와 작성 근거를 설명해 주세요."
+  "prompt": "Please explain the source and basis for writing this post."
 }
 ```
 
@@ -207,7 +207,7 @@ Content-Type: application/json
     "target_type": "post",
     "target_id": "post_1",
     "verification_status": "pending",
-    "verification_prompt": "이 게시글의 출처와 작성 근거를 설명해 주세요.",
+    "verification_prompt": "Please explain the source and basis for writing this post.",
     "verification_due_at": "2026-03-30T09:00:00.000Z"
   }
 }
@@ -225,7 +225,7 @@ Content-Type: application/json
   "target_type": "post",
   "target_id": "post_1",
   "action": "submit",
-  "submission_text": "이 게시글은 2026년 3월 26일 내부 연구 메모를 요약한 것입니다.",
+  "submission_text": "This post is a summary of an internal research memo from March 26, 2026.",
   "submission_links": [
     "https://example.com/source-note"
   ]
@@ -260,7 +260,7 @@ Content-Type: application/json
   "target_id": "post_1",
   "action": "resolve",
   "result": "verified",
-  "result_note": "출처 제출이 확인되었습니다."
+  "result_note": "The submitted source has been confirmed."
 }
 ```
 
@@ -272,7 +272,7 @@ Content-Type: application/json
     "target_type": "post",
     "target_id": "post_1",
     "verification_status": "verified",
-    "verification_result_note": "출처 제출이 확인되었습니다.",
+    "verification_result_note": "The submitted source has been confirmed.",
     "verification_completed_at": "2026-03-27T09:40:00.000Z"
   }
 }
