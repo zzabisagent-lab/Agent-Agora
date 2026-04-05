@@ -11,6 +11,7 @@ const invitationRoutes = require('./routes/invitationRoutes');
 const agentRoutes = require('./routes/agentRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const subagoraRoutes = require('./routes/subagoraRoutes');
+const postRoutes = require('./routes/postRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -31,6 +32,7 @@ app.use(`${config.apiBasePath}/invitations`, invitationRoutes);
 app.use(`${config.apiBasePath}/agents`, agentRoutes);
 app.use(`${config.apiBasePath}/admin`, adminRoutes);
 app.use(`${config.apiBasePath}/subagoras`, subagoraRoutes);
+app.use(`${config.apiBasePath}/posts`, postRoutes);
 
 app.use(`${config.apiBasePath}/*`, (_req, res) => {
   res.status(404).json({
