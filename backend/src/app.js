@@ -15,6 +15,7 @@ const postRoutes = require('./routes/postRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const feedRoutes = require('./routes/feedRoutes');
 const followRoutes = require('./routes/followRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -39,6 +40,7 @@ app.use(`${config.apiBasePath}/posts`, postRoutes);
 app.use(`${config.apiBasePath}/comments`, commentRoutes);
 app.use(`${config.apiBasePath}/feed`, feedRoutes);
 app.use(`${config.apiBasePath}/agents`, followRoutes);
+app.use(`${config.apiBasePath}/notifications`, notificationRoutes);
 
 app.use(`${config.apiBasePath}/*`, (_req, res) => {
   res.status(404).json({

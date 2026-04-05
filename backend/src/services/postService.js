@@ -1,6 +1,8 @@
 const Post = require('../models/Post');
 const SubAgora = require('../models/SubAgora');
 const { calcHotScore } = require('../utils/hotScore');
+const { createNotification } = require('./notificationService');
+const Follow = require('../models/Follow');
 
 function encodeCursor(sortValue, id) {
   return Buffer.from(JSON.stringify({ v: String(sortValue), id: id.toString() })).toString('base64url');
@@ -64,6 +66,32 @@ async function createPost(actorType, actorId, actorName, body) {
   await post.save();
 
   await SubAgora.findByIdAndUpdate(subAgora._id, { $inc: { posts_count: 1 } });
+
+  // Notify followers if agent posts
+  if (actorType === 'agent') {
+    setImmediate(async () => {
+      try {
+        const followerKey = `agent:${actorId}`;
+        const follows = await Follow.find({ target_agent: actorId }).lean();
+        for (const f of follows) {
+          const recpId = f.follower_type === 'human' ? f.follower_human : f.follower_agent;
+          await createNotification({
+            type: 'followed_agent_post',
+            recipientType: f.follower_type,
+            recipientId: recpId,
+            actorType,
+            actorId,
+            actorName,
+            post: post._id,
+            subagora: subAgora._id,
+            message: `${actorName} posted in /a/${subagora_name}`,
+          });
+        }
+      } catch {
+        // Silently ignore
+      }
+    });
+  }
 
   return { success: true, post };
 }

@@ -2,6 +2,7 @@ const Comment = require('../models/Comment');
 const Post = require('../models/Post');
 const SubAgora = require('../models/SubAgora');
 const { buildTree } = require('../serializers/commentTreeSerializer');
+const { createNotification } = require('./notificationService');
 
 const MAX_DEPTH = 6;
 
@@ -38,6 +39,44 @@ async function createComment(actorType, actorId, actorName, postId, body) {
   });
 
   await Post.findByIdAndUpdate(postId, { $inc: { comment_count: 1 } });
+
+  // Notifications (fire-and-forget, don't block response)
+  setImmediate(async () => {
+    try {
+      const postAuthorType = post.author_type;
+      const postAuthorId = postAuthorType === 'human' ? post.author_human : post.author_agent;
+      if (parentComment) {
+        // Notify parent comment author (reply)
+        const parentAuthorType = parentComment.author_type;
+        const parentAuthorId = parentAuthorType === 'human' ? parentComment.author_human : parentComment.author_agent;
+        await createNotification({
+          type: 'reply_to_comment',
+          recipientType: parentAuthorType,
+          recipientId: parentAuthorId,
+          actorType,
+          actorId,
+          actorName,
+          post: postId,
+          comment: comment._id,
+          message: `${actorName} replied to your comment`,
+        });
+      }
+      // Notify post author (new comment)
+      await createNotification({
+        type: 'new_comment_on_post',
+        recipientType: postAuthorType,
+        recipientId: postAuthorId,
+        actorType,
+        actorId,
+        actorName,
+        post: postId,
+        comment: comment._id,
+        message: `${actorName} commented on your post`,
+      });
+    } catch {
+      // Silently ignore notification errors
+    }
+  });
 
   return { success: true, comment };
 }
